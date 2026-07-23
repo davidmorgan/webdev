@@ -53,11 +53,21 @@ void main() {
         );
         expect(
           () => buildPackages.pathFor(
-            AssetId('not_build_runner', 'lib/a.txt'),
+            AssetId('test', 'lib/a.txt'),
             hide: false,
             checkWriteAllowed: true,
           ),
           throwsA(isA<InvalidOutputException>()),
+        );
+      });
+
+      test('hide output throws on unknown package', () {
+        expect(
+          () => buildPackages.pathFor(
+            AssetId('unknown_package', 'lib/a.txt'),
+            hide: true,
+          ),
+          throwsA(isA<PackageNotFoundException>()),
         );
       });
     });

@@ -8,6 +8,13 @@ import '../../build_plan/build_step_plan.dart';
 import '../build_state/build_state.dart';
 
 extension AssetIdExtension on AssetId {
+  /// Returns this instance if it is exactly an [AssetId] (not a subtype),
+  /// otherwise copies it into a new [AssetId].
+  ///
+  /// This guarantees immutability, normalizes paths, and validates the
+  /// package for custom implementations.
+  AssetId get exact => runtimeType == AssetId ? this : AssetId(package, path);
+
   bool get isDart => extension == '.dart';
 
   /// Whether the asset is hidden.
