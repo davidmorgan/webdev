@@ -1,3 +1,7 @@
+## 4.0.4-wip
+
+- Add experimental `--frontend-server` mode to `build` and `serve` without `build_daemon` or `build_web_compilers`.
+
 ## 4.0.3
 
 - Fix failing debugger expression evaluation.

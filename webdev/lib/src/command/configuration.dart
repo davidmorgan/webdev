@@ -36,6 +36,7 @@ const canaryFeaturesFlag = 'canary';
 const moduleFormatFlag = 'module-format';
 const offlineFlag = 'offline';
 const webHotReloadFlag = 'web-hot-reload';
+const frontendServerFlag = 'frontend-server';
 
 ReloadConfiguration _parseReloadConfiguration(ArgResults argResults) {
   var auto = argResults.options.contains(autoOption)
@@ -111,6 +112,7 @@ class Configuration {
   final String? _moduleFormat;
   final bool? _offline;
   final bool? _webHotReload;
+  final bool? _frontendServer;
 
   Configuration({
     bool? autoRun,
@@ -139,6 +141,7 @@ class Configuration {
     String? moduleFormat,
     bool? offline,
     bool? webHotReload,
+    bool? frontendServer,
   }) : _autoRun = autoRun,
        _chromeDebugPort = chromeDebugPort,
        _debugExtension = debugExtension,
@@ -166,7 +169,8 @@ class Configuration {
            ? 'ddc'
            : moduleFormat,
        _offline = offline,
-       _webHotReload = webHotReload {
+       _webHotReload = webHotReload,
+       _frontendServer = frontendServer {
     _validateConfiguration();
   }
 
@@ -265,6 +269,7 @@ class Configuration {
     moduleFormat: other._moduleFormat ?? _moduleFormat,
     offline: other._offline ?? _offline,
     webHotReload: other._webHotReload ?? _webHotReload,
+    frontendServer: other._frontendServer ?? _frontendServer,
   );
 
   factory Configuration.noInjectedClientDefaults() =>
@@ -314,6 +319,8 @@ class Configuration {
   bool get canaryFeatures => _canaryFeatures ?? false;
 
   bool get webHotReload => _webHotReload ?? false;
+
+  bool get frontendServer => _frontendServer ?? false;
 
   String get moduleFormat => _moduleFormat ?? 'ddc';
 
@@ -520,6 +527,10 @@ class Configuration {
         ? argResults[offlineFlag] as bool?
         : defaultConfiguration.offline;
 
+    final frontendServer = argResults.options.contains(frontendServerFlag)
+        ? argResults[frontendServerFlag] as bool?
+        : defaultConfiguration.frontendServer;
+
     return Configuration(
       autoRun: defaultConfiguration.autoRun,
       chromeDebugPort: chromeDebugPort,
@@ -547,6 +558,7 @@ class Configuration {
       canaryFeatures: coercedCanaryFeatures ?? canaryFeatures,
       moduleFormat: coercedModuleFormat ?? moduleFormat,
       offline: offline,
+      frontendServer: frontendServer,
     );
   }
 }

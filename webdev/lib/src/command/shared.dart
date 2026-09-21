@@ -101,6 +101,15 @@ void addSharedArgs(
       defaultsTo: false,
       negatable: false,
       help: 'Disable fetching from pub.dev.',
+    )
+    ..addFlag(
+      frontendServerFlag,
+      defaultsTo: false,
+      negatable: true,
+      hide: true,
+      help:
+          'Compile and serve directly using FrontendServer and dart compile js '
+          'without build_daemon or build_web_compilers.',
     );
 }
 
@@ -161,12 +170,15 @@ List<String> buildRunnerArgs(Configuration configuration) {
   return arguments;
 }
 
-Future<void> validatePubspecLock(Configuration configuration) async {
+Future<PubspecLock> validatePubspecLock(Configuration configuration) async {
   final pubspecLock = await PubspecLock.read(offline: configuration.offline);
-  await checkPubspecLock(
-    pubspecLock,
-    requireBuildWebCompilers: configuration.requireBuildWebCompilers,
-  );
+  if (!configuration.frontendServer) {
+    await checkPubspecLock(
+      pubspecLock,
+      requireBuildWebCompilers: configuration.requireBuildWebCompilers,
+    );
+  }
+  return pubspecLock;
 }
 
 /// Checks that the normalized form of [path] is a top level directory under

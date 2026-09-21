@@ -17,6 +17,7 @@ import 'package:logging/logging.dart' as logging;
 import '../daemon_client.dart';
 import '../logging.dart';
 import '../pubspec.dart';
+import '../serve/frontend_server_workflow.dart';
 import 'configuration.dart';
 import 'shared.dart';
 
@@ -54,8 +55,9 @@ class BuildCommand extends Command<int> {
     configureLogWriter(configuration.verbose);
 
     List<String> arguments;
+    PubspecLock pubspecLock;
     try {
-      await validatePubspecLock(configuration);
+      pubspecLock = await validatePubspecLock(configuration);
       arguments = buildRunnerArgs(configuration)..addAll(validExtraArgs);
     } on PackageException catch (e) {
       logWriter(
@@ -64,6 +66,13 @@ class BuildCommand extends Command<int> {
         error: '${e.details}',
       );
       rethrow;
+    }
+
+    if (configuration.frontendServer) {
+      return await runFrontendServerBuild(
+        configuration: configuration,
+        hasBuildRunner: pubspecLock.hasPackage('build_runner'),
+      );
     }
 
     try {

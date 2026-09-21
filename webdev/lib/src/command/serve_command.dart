@@ -11,6 +11,7 @@ import 'package:logging/logging.dart';
 import '../logging.dart';
 import '../pubspec.dart';
 import '../serve/dev_workflow.dart';
+import '../serve/frontend_server_workflow.dart';
 import 'configuration.dart';
 import 'shared.dart';
 
@@ -135,8 +136,9 @@ refresh: Performs a full page refresh.
     Configuration configuration;
     configuration = Configuration.fromArgs(argResults);
     configureLogWriter(configuration.verbose);
+    PubspecLock pubspecLock;
     try {
-      await validatePubspecLock(configuration);
+      pubspecLock = await validatePubspecLock(configuration);
     } on PackageException catch (e) {
       logWriter(Level.SEVERE, 'Pubspec errors: ', error: '${e.details}');
       rethrow;
@@ -151,6 +153,16 @@ refresh: Performs a full page refresh.
         .toList();
     final targetPorts = parseDirectoryArgs(directoryArgs);
     validateLaunchApps(configuration.launchApps, targetPorts.keys);
+
+    if (configuration.frontendServer) {
+      final workflow = await FrontendServerWorkflow.start(
+        configuration,
+        targetPorts,
+        hasBuildRunner: pubspecLock.hasPackage('build_runner'),
+      );
+      await workflow.done;
+      return 0;
+    }
 
     final workflow = await DevWorkflow.start(
       configuration,

@@ -103,6 +103,9 @@ class PubspecLock {
     return PubspecLock(packages);
   }
 
+  bool hasPackage(String pkgName) =>
+      _packages != null && _packages.containsKey(pkgName);
+
   List<PackageExceptionDetails> checkPackage(
     String pkgName,
     VersionConstraint constraint, {
